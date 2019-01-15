@@ -234,15 +234,12 @@ class OriginEventSource {
       throw new Error('Invalid offer: currency does not match listing')
     }
 
-    // TODO: uncomment when we create new listings, including demo listings,
-    //  with affiliates and arbitrators
-    /*
     const offerArbitrator = offer.arbitrator
-      && offer.arbitrator.id
-      && offer.arbitrator.id.toLowerCase()
+      ? offer.arbitrator.id.toLowerCase()
+      : ZERO_ADDRESS
     const listingArbitrator = listing.arbitrator
-      && listing.arbitrator.id
-      && listing.arbitrator.id.toLowerCase()
+      ? listing.arbitrator.id.toLowerCase()
+      : ZERO_ADDRESS
     if (offerArbitrator !== listingArbitrator) {
       throw new Error(
         `Arbitrator: offer ${offerArbitrator} !== listing ${listingArbitrator}`
@@ -250,17 +247,16 @@ class OriginEventSource {
     }
 
     const offerAffiliate = offer.affiliate
-      && offer.affiliate.id
-      && offer.affiliate.id.toLowerCase()
+      ? offer.affiliate.id.toLowerCase()
+      : ZERO_ADDRESS
     const listingAffiliate = listing.affiliate
-      && listing.affiliate.id
-      && listing.affiliate.id.toLowerCase()
+      ? listing.affiliate.id.toLowerCase()
+      : ZERO_ADDRESS
     if (offerAffiliate !== listingAffiliate) {
       throw new Error(
         `Affiliate: offer ${offerAffiliate} !== listing ${listingAffiliate}`
       )
     }
-    */
 
     if (listing.type !== 'unit') {
       // TODO: validate fractional offers

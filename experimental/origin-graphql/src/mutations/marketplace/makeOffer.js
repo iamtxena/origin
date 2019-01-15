@@ -8,6 +8,7 @@ const ZeroAddress = '0x0000000000000000000000000000000000000000'
 async function makeOffer(_, data) {
   await checkMetaMask(data.from)
   const { listingId } = parseId(data.listingID)
+  const listing = await contracts.eventSource.getListing(listingId)
 
   const ipfsData = {
     schemaId: 'https://schema.originprotocol.com/offer_1.0.0.json',
@@ -35,9 +36,12 @@ async function makeOffer(_, data) {
     .allowedAffiliates(marketplace.options.address)
     .call()
 
+  const affiliate = data.affiliate
+    || (listing.affiliate && listing.affiliate.id)
+    || ZeroAddress
   if (!affiliateWhitelistDisabled) {
     const affiliateAllowed = await marketplace.methods
-      .allowedAffiliates(data.affiliate)
+      .allowedAffiliates(affiliate)
       .call()
 
     if (!affiliateAllowed) {
@@ -48,16 +52,19 @@ async function makeOffer(_, data) {
   const ipfsHash = await post(contracts.ipfsRPC, ipfsData)
   const commission = contracts.web3.utils.toWei(ipfsData.commission.amount, 'ether')
   const value = contracts.web3.utils.toWei(data.value, 'ether')
+  const arbitrator = data.arbitrator
+    || (listing.arbitrator && listing.arbitrator.id)
+    || ZeroAddress
 
   const args = [
     listingId,
     ipfsHash,
     ipfsData.finalizes,
-    data.affiliate || ZeroAddress,
+    affiliate,
     commission,
     value,
     data.currency || ZeroAddress,
-    data.arbitrator || ZeroAddress
+    arbitrator
   ]
   if (data.withdraw) {
     const { offerId } = parseId(data.withdraw)
